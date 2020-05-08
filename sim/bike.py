@@ -1,3 +1,5 @@
+from consts import *
+
 class Bike:
     """
     Base class for Bikes. 
@@ -6,7 +8,7 @@ class Bike:
     (e.g. price()) will only work for subclasses of Bike.
     """
 
-    conditions = ['good', 'fair', 'poor', 'no service']
+    conditions = CONDITIONS
 
     def __init__(self, id):
         """
@@ -83,8 +85,8 @@ class ClassicBike(Bike):
     """
     def __init__(self, id):
         Bike.__init__(self, id)
-        self.base_rate = 3.50
-        self.add_rate = 0.10
+        self.base_rate = CLASSIC_BASE_RATE
+        self.add_rate = CLASSIC_ADD_RATE
 
 
 class ElectricBike(Bike):
@@ -95,9 +97,9 @@ class ElectricBike(Bike):
 
     def __init__(self, id):
         Bike.__init__(self, id)
-        self.base_rate = 5.25
-        self.add_rate = 0.2
-        self.charge = 100
+        self.base_rate = ELECTRIC_BASE_RATE
+        self.add_rate = ELECTRIC_ADD_RATE
+        self.charge = ELECTRIC_MAX_CHARGE
     
     def update_charge(self):
         """
