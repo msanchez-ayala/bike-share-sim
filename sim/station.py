@@ -1,4 +1,6 @@
 from .dock import Dock
+from .bike import ClassicBike
+from .assert_helpers import assert_greater_than_zero
 
 class Station:
     """
@@ -6,7 +8,7 @@ class Station:
     entries and exits.
     """
 
-    def __init__(self, id, location, size):
+    def __init__(self, id, location, size, num_bikes = 0, bike_id_start = None):
         """
         Creates a new Station.
 
@@ -17,20 +19,51 @@ class Station:
         location: [tuple] coordinates of the station.
 
         size: [int > 0] number of docks that the station holds.
+
+        num_bikes: [0 < int < self.size] (optional) The number of bikes to put 
+                   into this station. Should only be omitted if we want all docks to be empty.
+        
+        bike_id_start: [0 <= int <= num_bikes] (Optional) The id with which to  
+                       start numbering bikes.
         """
+        # Assert all inputs
+        self.assert_id(id)
+        self.assert_location(location)
+        self.assert_size(size)
+        self.assert_num_bikes(size, num_bikes)
+
         self.id = id
         self.location = location
         self.size = size
-        self.init_docks()
+        self.init_docks(num_bikes, bike_id_start)
 
-    def init_docks(self):
+    def init_docks(self, num_bikes, bike_id_start):
         """
         Creates a list of Dock objects that can hold bikes. Docks do not move,
         and are the only part of the station that interacts with Bike objs.
         """
         self.docks = []
+        bikes_left = num_bikes
+        bike_id = bike_id_start
+
+        # Instantiate each Dock to populate the dock attribute
         for i in range(self.size):
-            self.docks.append(Dock(i))
+            
+            # If more bikes to be added, instantiate Dock w/ ClassicBike
+            if bikes_left > 0:   
+                
+                # Set up bike and dock, put it into docks
+                bike = ClassicBike(bike_id)
+                dock = Dock(i, bike)
+                self.docks.append(dock)
+
+                # Prepare for next iteration of loop
+                bike_id += 1
+                bikes_left -= 1
+            
+            # Otherwise instantiate empty Dock
+            elif bikes_left == 0:
+                self.docks.append(Dock(i))
 
     @property
     def log(self):
@@ -62,6 +95,42 @@ class Station:
                     result.append(trip)
 
         return result
-
     
+    ### ASSERTION HELPERS ###
 
+    def assert_id(self, id):
+        if not isinstance(id, int):
+            raise TypeError('id must be an int')
+        
+        assert_greater_than_zero(id, 'id')
+    
+    def assert_location(self, location):
+        if not isinstance(location, tuple):
+            raise TypeError('location must be a tuple with coordinates')
+            
+        if len(location) != 2:
+            raise ValueError('location must contain only 2 elements')
+        
+        for coord in location:
+            if not isinstance(coord, int) or isinstance(coord, float):
+                raise TypeError('coordinates must be floats or ints')
+        
+    def assert_size(self, size):
+        if not isinstance(size, int):
+            raise TypeError('size must be an int')
+
+        assert_greater_than_zero(size, 'size')
+
+    def assert_num_bikes(self, size, num_bikes):
+        """
+        Makes sure preconditions are met.
+        """
+        # If optional arg is passed
+        if num_bikes:
+            if not isinstance(num_bikes, int):
+                raise TypeError('num_bikes must be an int')
+            
+            assert_greater_than_zero(id, 'id')
+
+            if num_bikes > size:
+                raise ValueError('num_bikes must be less than size')
