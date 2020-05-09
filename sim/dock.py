@@ -1,4 +1,6 @@
 from .consts import CONDITIONS
+from .assert_helpers import assert_id
+from .bike import ClassicBike
 
 class Dock:
     """
@@ -14,8 +16,11 @@ class Dock:
 
         bike: [Bike | None] The Bike or None value to occupy this dock.
         """
+        assert_id(id)
+        self.assert_bike(bike)
+
         self.id = id
-        self.bike = None
+        self.bike = bike
         self.condition = self.conditions[0]
         self.log = []
     
@@ -58,4 +63,12 @@ class Dock:
 
         self.bike = None
     
+
+    ### ASSERTION HELPERS ### 
+    
+
+    def assert_bike(self, bike):
+        if bike:
+            if not isinstance(bike, ClassicBike):
+                raise TypeError('This bike is not a ClassicBike')
 

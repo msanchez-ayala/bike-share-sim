@@ -6,7 +6,6 @@ from sim.station import Station
 class TestDock(unittest.TestCase):
 
     def setUp(self):
-        print('setUp')
         self.dock = Dock(1)
         
         # Instantiate a bike and station. Ride bike into this dock
@@ -14,8 +13,20 @@ class TestDock(unittest.TestCase):
         self.station = Station(1, (0, 0), 1)
         self.bike.ride()
 
-    def tearDown(self):
-        print('tearDown\n')
+    def test_init_value_errors(self):
+        """
+        Check that all appropriate value errors are thrown by __init__()
+        """
+        with self.assertRaises(ValueError):
+            self.dock = Dock(-1)
+    
+    def test_init_type_errors(self):
+        """
+        Check that all appropriate type errors are thrown by __init__()
+        """
+        with self.assertRaises(TypeError):
+            self.dock = Dock('A')             # id
+            self.dock = Dock(1, 'Not a Bike') # ClassicBike instance
     
     def test_check_in(self):
         self.assertIsNone(self.dock.bike)
