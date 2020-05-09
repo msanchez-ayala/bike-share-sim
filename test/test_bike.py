@@ -6,11 +6,21 @@ class TestBike(unittest.TestCase):
     print('testing Bike')
 
     def setUp(self):
-        print('Setting up')
         self.bike = Bike(1)
-
-    def tearDown(self):
-        print('Tearing down\n')
+    
+    def test_init_value_errors(self):
+        """
+        Check that all appropriate value errors are thrown by __init__()
+        """
+        with self.assertRaises(ValueError):
+            self.bike = Bike(-1)        # id
+    
+    def test_init_type_errors(self):
+        """
+        Check that all appropriate type errors are thrown by __init__()
+        """
+        with self.assertRaises(TypeError):
+            self.bike = Bike('A')        # id
 
     def test_ride(self):
 
@@ -33,7 +43,7 @@ class TestBike(unittest.TestCase):
             self.bike.ride()
         
         self.assertEqual(self.bike._uses, 150)
-        self.assertEqual(self.bike.condition, 'no service')
+        self.assertEqual(self.bike.condition, 'not in service')
         
 
 class TestClassicBike(unittest.TestCase):
@@ -41,11 +51,21 @@ class TestClassicBike(unittest.TestCase):
     print('testing ClassicBike')
 
     def setUp(self):
-        print('Setting up')
         self.bike = ClassicBike(1)
-
-    def tearDown(self):
-        print('Tearing down\n')
+    
+    def test_init_value_errors(self):
+        """
+        Check that all appropriate value errors are thrown by __init__()
+        """
+        with self.assertRaises(ValueError):
+            self.bike = ClassicBike(-1) # id
+    
+    def test_init_type_errors(self):
+        """
+        Check that all appropriate type errors are thrown by __init__()
+        """
+        with self.assertRaises(TypeError):
+            self.bike = ClassicBike('A') # id
     
     def test_price(self):
         self.assertEqual(self.bike.price(45), 5.00)
@@ -55,22 +75,7 @@ class TestClassicBike(unittest.TestCase):
 
 class TestElectricBike(unittest.TestCase):
 
-    print('testing ElectricBike')
-
-    def setUp(self):
-        print('Setting up')
-        self.bike = ElectricBike(1)
-
-    def tearDown(self):
-        print('Tearing down\n')
-
-    def test_price_cases(self):
-        self.assertEqual(self.bike.price(45), 8.25)
-        self.assertEqual(self.bike.price(10), 5.25)
-        self.assertEqual(self.bike.price(30), 5.25)
-
-    # def test_update_charge(self):
-    #     pass
+    pass
 
 
 if __name__ == '__main__':

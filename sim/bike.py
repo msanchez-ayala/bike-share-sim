@@ -1,4 +1,5 @@
 from .consts import *
+from .assert_helpers import assert_id
 
 class Bike:
     """
@@ -18,6 +19,8 @@ class Bike:
 
         rate: [float >= 0] the cost per 30-minute ride.
         """
+        assert_id(id)
+
         self.id = id
         self.condition = self.conditions[0]
         self._uses = 0
@@ -116,3 +119,5 @@ class ElectricBike(Bike):
         - Can only check one out if charge is above 60 (enough for 30-min ride)
         """
         pass
+
+
