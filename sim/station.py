@@ -2,7 +2,8 @@ from .dock import Dock
 
 class Station:
     """
-    Stations hold docks and store a log of bike entries and exits.
+    Stations hold multiple docks and can retrieve a compiled log of bike 
+    entries and exits.
     """
 
     def __init__(self, id, location, size):
@@ -11,9 +12,11 @@ class Station:
 
         Parameters
         ----------
-        id: [int] the id no. for the station.
+        id: [int >= 0] the id no. for the station.
+
         location: [tuple] coordinates of the station.
-        size: [int] number of docks that the station holds.
+
+        size: [int > 0] number of docks that the station holds.
         """
         self.id = id
         self.location = location
@@ -27,8 +30,7 @@ class Station:
         """
         self.docks = []
         for i in range(self.size):
-            # self.docks.append(Dock(ARGS))
-            pass
+            self.docks.append(Dock(i))
 
     @property
     def log(self):
@@ -37,13 +39,29 @@ class Station:
         --------
         Full log of activities from all docks in this station.
         """
-        log = []
+        result = []
 
         # Go through each dock and access the log attribute. Append to full log
         # and return
-        for i in range(size):
-            if self.docks[i]:
-                log.append(docks)
+        for i in range(self.size):
+            if self.docks[i].log:
+                
+                current_log = self.docks[i].log
+
+                for trip in current_log:
+
+                    # If this is start of a trip, add start station
+                    if trip.get('start_time'):
+                        trip['start_station_id'] = self.id
+
+                    # If it's an end of a trip, add end station
+                    elif trip.get('end_time'):
+                        trip['end_station_id'] = self.id
+
+                    # Add all individual trips to the total log
+                    result.append(trip)
+
+        return result
 
     
 
