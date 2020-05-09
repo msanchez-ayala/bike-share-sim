@@ -24,7 +24,7 @@ class Dock:
         self.condition = self.conditions[0]
         self.log = []
     
-    def check_in(self, bike, time, station):
+    def check_in(self, bike, time):
         """
         Check a bike into this dock.
 
@@ -33,8 +33,6 @@ class Dock:
         bike: [Bike] The bike parking at this station.
 
         time: [int] The time in minutes since the simulation began.
-
-        station: [int] The station id corresponding to where this dock resides.
         """
         self.bike = bike
         self.log.append({
@@ -43,15 +41,13 @@ class Dock:
             'end_time': time
         })
 
-    def check_out(self, time, station):
+    def check_out(self, time):
         """
         Check a bike out of this dock.
 
         Parameters
         ----------
         time: [int] The time in minutes since the simulation began.
-
-        station: [int] The station id corresponding to where this dock resides.
         """
         self.bike.ride()
 
