@@ -4,10 +4,6 @@ from sim.dock import Dock
 from sim.bike import ClassicBike
 
 class TestStation(unittest.TestCase):
-
-    # def setUp(self):
-    #     self.station_1 = Station(1, (0, 0), 4)
-    #     self.station_2 = Station(2, (3, 3), 8)
     
     def test_init_value_errors(self):
         """
@@ -61,18 +57,24 @@ class TestStation(unittest.TestCase):
         bike_2 = ClassicBike(2)
 
         self.station.docks[0].bike = bike_1
-        self.station.docks[1].bike = bike_2
 
         # Make a bike move and check log again
-        self.station.docks[0].check_out(10, self.station) # station_1 redundant
-        self.assertEqual(self.station.log, [{
+        self.station.docks[0].check_out(10)
+        self.assertEqual(self.station.log[0], {
             'bike_id': 1,
             'trip_id': 1, # Fix this if we fix dock code
             'start_time': 10,
-            'start_station_id': 1 # Fix this if we fix dock code
-        }])
+            'start_station_id': 1
+        })
 
-        # Make a bike move at a different station and check log again
+        # Make a different bike move at another dock and check again
+        self.station.docks[2].check_in(bike_2, 15)
+        self.assertEqual(self.station.log[1], {
+            'bike_id': 2,
+            'trip_id': 0, # Fix this if we fix dock code
+            'end_time': 15,
+            'end_station_id': 1
+        })
 
 if __name__ == '__main__':
     unittest.main()
