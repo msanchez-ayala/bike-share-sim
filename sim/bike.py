@@ -1,4 +1,4 @@
-from consts import *
+from .consts import *
 
 class Bike:
     """
@@ -48,14 +48,18 @@ class Bike:
 
         If bike is out of service, try another dock.
         """
-        # If condition isn't 'no service'
-        if self.condition != self.conditions[3]:
-            self._uses += 1
-            self.update_condition()
+        # Update when ready to consider wear/tear
+        self._uses += 1
+        self.update_condition()
+
+        # # If condition isn't 'no service'
+        # if self.condition != self.conditions[3]:
+        #     self._uses += 1
+        #     self.update_condition()
         
-        # Don't let people ride a bike that is in poor condition
-        else:
-            return 'Bike out of service'
+        # # Don't let people ride a bike that is in poor condition
+        # else:
+        #     return 'Bike out of service'
     
     def price(self, duration):
         """
