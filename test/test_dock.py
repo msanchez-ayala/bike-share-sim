@@ -33,14 +33,17 @@ class TestDock(unittest.TestCase):
 
     def test_check_out(self):
 
-        # Check bike in 5 mins after init at station
+        # Check bike in 5 mins after init at station (since the dock was 
+        # initialized without a bike in it
+
         self.dock.check_in(self.bike, 5, self.station)
+        
         self.dock.check_out(10, self.station)
 
         self.assertIsNone(self.dock.bike)
         self.assertEqual(self.dock.log[1], {
             'bike_id': 1,
-            'trip_id': 2, # Fix this if we fix dock code
+            'trip_id': 2, # 2 because setUp() and checkout() both invoke ride()
             'start_time': 10
         })
 

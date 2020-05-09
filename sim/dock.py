@@ -6,7 +6,14 @@ class Dock:
     """
     conditions = CONDITIONS
 
-    def __init__(self, id):
+    def __init__(self, id, bike = None):
+        """
+        Parameters
+        ----------
+        id: [int >= 0] the id no. for the station.
+
+        bike: [Bike | None] The Bike or None value to occupy this dock.
+        """
         self.id = id
         self.bike = None
         self.condition = self.conditions[0]
