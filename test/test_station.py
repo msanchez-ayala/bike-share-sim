@@ -16,10 +16,20 @@ class TestStation(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.station = Station(-1, (0,0), 1)     # id
             self.station = Station(0, (0, 0, 0), 1)  # location
-            self.station = Station(0, (0, 0), -1)    # station
+            self.station = Station(0, (0, 0), -1)    # size
             self.station = Station(0, (0, 0), 2, 3)  # num_bikes
             self.station = Station(0, (0, 0), 2, -1) # num_bikes
-
+        
+    def test_init_type_errors(self):
+        """
+        Check that all appropriate type errors are thrown by __init__()
+        """
+        with self.assertRaises(TypeError):
+            self.station = Station(0.0, (0,0), 1)     # id
+            self.station = Station(0, [0, 0], 1)      # location
+            self.station = Station(0, (0, '0'), 1)    # location
+            self.station = Station(0, (0, 0), '1')    # size
+            self.station = Station(0, (0, 0), 2, '1') # num_bikes
 
     def test_init_docks_empty(self):
         """
@@ -39,9 +49,6 @@ class TestStation(unittest.TestCase):
         self.assertEqual(self.station.docks[0].bike.id, 0)
         self.assertEqual(self.station.docks[1].bike.id, 1)
         self.assertIsNone(self.station.docks[2].bike)        
-    
-    
-            
     
     def test_log(self):
         self.station = Station(1, (0, 0), 4)

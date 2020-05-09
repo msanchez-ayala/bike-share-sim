@@ -130,7 +130,8 @@ class Station:
             if not isinstance(num_bikes, int):
                 raise TypeError('num_bikes must be an int')
             
-            assert_greater_than_zero(id, 'id')
+            elif isinstance(num_bikes, int):
+                assert_greater_than_zero(num_bikes, 'num_bikes')
 
-            if num_bikes > size:
-                raise ValueError('num_bikes must be less than size')
+                if num_bikes > size:
+                    raise ValueError('num_bikes must be less than size')
