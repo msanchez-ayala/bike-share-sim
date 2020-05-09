@@ -28,8 +28,7 @@ class TestDock(unittest.TestCase):
         self.assertEqual(self.dock.log[0], {
             'bike_id': 1,
             'trip_id': 1, # Fix this if we fix dock code
-            'end_time': 5,
-            'end_station_id': 1, # same as above
+            'end_time': 5
         })
 
     def test_check_out(self):
@@ -41,16 +40,9 @@ class TestDock(unittest.TestCase):
         self.assertIsNone(self.dock.bike)
         self.assertEqual(self.dock.log[1], {
             'bike_id': 1,
-            'trip_id': 1, # Fix this if we fix dock code
-            'start_time': 10,
-            'start_station_id': 1 # Same as above
+            'trip_id': 2, # Fix this if we fix dock code
+            'start_time': 10
         })
-
-
-
-
-
-
 
 
 if __name__ == '__main__':

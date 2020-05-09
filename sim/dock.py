@@ -28,8 +28,7 @@ class Dock:
         self.log.append({
             'bike_id': self.bike.id,
             'trip_id': self.bike._uses, # This line may mess us up. not sure how to track yet
-            'end_time': time,
-            'end_station_id': station.id, # This line may also mess us up
+            'end_time': time
         })
 
     def check_out(self, time, station):
@@ -42,11 +41,12 @@ class Dock:
 
         station: [int] The station id corresponding to where this dock resides.
         """
+        self.bike.ride()
+
         self.log.append({
             'bike_id': self.bike.id,
             'trip_id': self.bike._uses, # This line may mess us up. not sure how to track yet
-            'start_time': time,
-            'start_station_id': station.id # This line may also mess us up
+            'start_time': time
         })
 
         self.bike = None
