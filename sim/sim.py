@@ -29,8 +29,8 @@ class Simulation:
               be defined later.
         """
         self.stations = [
-            Station(0, (0, 0), 1, 1, 1),
-            Station(1, (1, 1), 1, 0, 2)
+            Station(0, (0, 0), 1, 1, 0),
+            Station(1, (1, 1), 1)
         ]
 
         self.run(60)
