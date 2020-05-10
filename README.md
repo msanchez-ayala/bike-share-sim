@@ -16,10 +16,10 @@ run
 ```
 python sim
 ```
-It currently doesn't do much other than instantiate two Stations, each with one
-Dock. One of those two docks is filled with a ClassicBike that will travel 
-back and forth between the two stations as such:
-![basic_sim](/images/basic_sim.png)
+It currently doesn't do much other than instantiate a Station holding one
+Dock with a ClassicBike inside that will be checkout out and then returned
+back to that same station.
+![simplest_sim](/images/siplest_sim.png)
 
 ### Next Steps
 Once the basic simulation above is configured correctly, I'll expand one at
