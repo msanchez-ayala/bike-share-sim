@@ -1,6 +1,6 @@
-from .dock import Dock
-from .bike import ClassicBike
-from .assert_helpers import assert_greater_than_zero
+from dock import Dock
+from bike import ClassicBike
+from assert_helpers import assert_greater_than_zero
 
 class Station:
     """

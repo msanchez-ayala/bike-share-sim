@@ -1,6 +1,6 @@
-from .consts import CONDITIONS
-from .assert_helpers import assert_id
-from .bike import ClassicBike
+from consts import CONDITIONS
+from assert_helpers import assert_id
+from bike import ClassicBike
 
 class Dock:
     """
