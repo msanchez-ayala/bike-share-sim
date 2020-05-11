@@ -1,6 +1,6 @@
-from dock import Dock
-from bike import ClassicBike
-from assert_helpers import assert_greater_than_zero
+from .dock import Dock
+from .bike import ClassicBike
+from .assert_helpers import assert_greater_than_zero
 
 class Station:
     """
@@ -95,6 +95,25 @@ class Station:
                     result.append(trip)
 
         return result
+    
+    @property
+    def available_bikes(self):
+        """
+        Returns
+        -------
+        The number of bikes currently docked at this station.
+        """
+        bikes = 0
+
+        for dock in self.docks:
+            if dock.bike:
+                bikes += 1
+        
+        return bikes
+    
+    @property
+    def available_docks(self):
+        return self.size - self.available_bikes
     
     ### ASSERTION HELPERS ###
 

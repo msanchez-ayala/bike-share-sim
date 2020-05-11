@@ -75,6 +75,26 @@ class TestStation(unittest.TestCase):
             'end_time': 15,
             'end_station_id': 1
         })
+    
+    def test_available_bikes(self):
+        self.station = Station(0, (0, 0), 3, 2, 0)
+        self.assertEqual(self.station.available_bikes, 2)
+
+        self.station.docks[0].check_out(0)
+        self.assertEqual(self.station.available_bikes, 1)
+
+        self.station = Station(0, (0, 0), 1)
+        self.assertEqual(self.station.available_bikes, 0)
+    
+    def test_available_docks(self):
+        self.station = Station(0, (0, 0), 3, 2, 0)
+        self.assertEqual(self.station.available_docks, 1)
+
+        self.station.docks[0].check_out(0)
+        self.assertEqual(self.station.available_docks, 2)
+
+        self.station = Station(0, (0, 0), 1, 1, 0)
+        self.assertEqual(self.station.available_docks, 0)
 
 if __name__ == '__main__':
     unittest.main()
