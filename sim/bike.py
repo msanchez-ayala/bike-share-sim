@@ -1,5 +1,5 @@
-from consts import *
-from assert_helpers import assert_id
+from .consts import *
+from .assert_helpers import assert_id
 
 class Bike:
     """
