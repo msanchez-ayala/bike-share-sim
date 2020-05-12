@@ -18,7 +18,7 @@ class Station:
 
         location: [tuple] coordinates of the station.
 
-        size: [int > 1] number of docks that the station holds.
+        size: [1 <= int <= 20] number of docks that the station holds.
 
         num_bikes: [0 < int < self.size] (optional) The number of bikes to put 
                    into this station. Should only be omitted if we want all docks to be empty.
@@ -138,8 +138,9 @@ class Station:
         if not isinstance(size, int):
             raise TypeError('size must be an int')
 
-        if size < 1:
-            raise ValueError('size must be greater than or equal to 1.')
+        if (size < 1 ) or (size > 20) :
+            raise ValueError('size must be in [1, 20].')
+
 
     def assert_num_bikes(self, size, num_bikes):
         """

@@ -14,6 +14,7 @@ class TestStation(unittest.TestCase):
             self.station = Station(0, (0, 0, 0), 1)  # location
             self.station = Station(0, (0, 0), -1)    # size
             self.station = Station(0, (0, 0), 0)     # docks
+            self.station = Station(0, (0, 0), 21)     # docks
             self.station = Station(0, (0, 0), 2, 3)  # num_bikes
             self.station = Station(0, (0, 0), 2, -1) # num_bikes
         
