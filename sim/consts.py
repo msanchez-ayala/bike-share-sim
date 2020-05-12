@@ -13,6 +13,7 @@ ELECTRIC_MAX_CHARGE = 100
 
 ### SIMULATION CONSTANTS ###
 
-# K = 1        # Calculate probability of a single ride occurring every minute
+
 LAMBDA = 0.1 # 1 ride / 10 mins or 0.1 ride / min
 LENGTH = 60  # Length of simulation in minutes
+SPEED = 0.5  # Distance units per minute

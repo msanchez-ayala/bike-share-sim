@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.distance import cityblock
 from .station import Station
 from .consts import *
 
@@ -32,9 +33,10 @@ class Simulation:
         """
         self.stations = [
             Station(0, (0, 0), 1, 1, 0),
-            Station(1, (1, 1), 1, 1, 1)
+            Station(1, (1, 1), 1)
         ]
         self.bikes_in_transit = []
+        self.bikes_to_dock = []
         
         self.print_start(length)
         self.run(length)
@@ -70,13 +72,160 @@ class Simulation:
             length, self.poisson_thresh)
 
         # Each loop represents one minute in the simulation    
-        for i, potential_checkout in enumerate(potential_checkouts):
-            print(f'Minute:', i+1)
-            # If the potential checkout is true, let's check a bike out
+        for time, potential_checkout in enumerate(potential_checkouts):
+            print(f'Minute:', time)
+
+            print('-- Bikes in transit', self.bikes_in_transit)
+            print('-- Bikes to dock', self.bikes_to_dock, '\n')
+
+            ### CHECK OUT SEQUENCE ###
+
+            # If the potential checkout is true, let's try to check a bike out
             if potential_checkout:
-                i = self.get_available_station('check out')
-                print(f'---- Bike checked out of Station {self.stations[i].id}')
+                station_i = self.get_available_station('check out')
+                print('---- Customer tried to checkout a bike')
+                
+                
+                # Only proceed if there exists an open dock
+                if station_i != None:
+
+
+                    print( 
+                        '----',
+                        self.stations[station_i].available_bikes,
+                        'bike(s) available'
+                    )
+
+
+                    # Find index of an open dock at this station and check out
+                    dock_i = self.get_available_dock(
+                        self.stations[station_i], 'check out'
+                    )
+
+                    # print(
+                    #     '---- Bike from dock:', 
+                    #     self.stations[station_i].docks[dock_i].bike
+                    # )
+
+                    bike = self.stations[station_i].docks[dock_i].check_out(time)
+                    end_station_id = self.determine_destination(station_i)
+                    duration = self.determine_trip_duration(
+                        station_i, end_station_id
+                    )
+
+                    # Add that bike to the in_transit list
+                    self.bikes_in_transit.append({
+                        'bike': bike,
+                        'destination': end_station_id,
+                        'time_left': duration
+                    })
+
+
+                    print(f'---- Bike checked out of Station: {station_i} Dock: {dock_i}')
+                    print(
+                        '---- Bike added to transit list',
+                        self.bikes_in_transit
+                    )
+                    print('---- Full log is now\n----', self.full_log)
+                
+                else:
+                    print('---- No available stations for checkout at this time')
+               
+            
+            ### CHECK IN SEQUENCE ###
+            if self.bikes_to_dock:
+
+                for bike in self.bikes_to_dock:
+                    
+                    # Two possiblities: original destination is open or isn't
+                    destination_id = bike['destination']
+                    dock_id = self.get_available_dock(
+                        self.stations[destination_id], 'check in'
+                    )
+                    # Is open
+                    if dock_id != None:
+                        self.stations[destination_id].docks[dock_id].check_in(
+                            bike['bike'], time
+                        )
+                    
+                    # Isn't open, pick a nearby station and go there. Origin is
+                    # now the old destination (destination_id)
+                    else:
+                        end_station_id = self.determine_destination(station_i)
+                        duration = self.determine_trip_duration(
+                            destination_id, end_station_id
+                        )
+
+                        # Add that bike to the in_transit list
+                        self.bikes_in_transit.append({
+                            'bike': bike,
+                            'destination': end_station_id,
+                            'time_left': duration
+                        })
+                self.bikes_to_dock = []
+
+
+            ### UPDATE BIKES IN TRANSIT ###
+            updated_bikes_in_transit = []
+            for bike in self.bikes_in_transit:
+                bike['time_left'] -= 1
+                if bike['time_left'] == 0:
+                    self.bikes_to_dock.append(bike)
+                elif bike['time_left'] > 0:
+                    updated_bikes_in_transit.append(bike)
+                else:
+                    raise ValueError(bike, 'Has negative time left')
+            self.bikes_in_transit = updated_bikes_in_transit
+
     
+    @property
+    def full_log(self):
+        """
+        Returns
+        -------
+        The compiled log of all stations in this system.
+        """
+        full_log = []
+        for station in self.stations:
+            full_log.extend(station.log)
+        return full_log
+
+    def determine_destination(self, start_station_id):
+        """
+        Returns
+        -------
+        List index of random destination station.
+
+        Parameters
+        ----------
+        start_station_id: [int] The list index of the station where the bike
+        is checked out from.
+        """
+        station_ids = np.arange((len(self.stations)))
+        station_ids = np.delete(station_ids, start_station_id)
+        end_station_id = np.random.choice(station_ids)
+        return end_station_id
+    
+    def determine_trip_duration(self, start_station_id, end_station_id):
+        """
+        Returns
+        ---------
+        The time the customer will take to ride the bike from the start location to the end location. Based on the manhattan distance between
+        two locations.
+
+        Parameters
+        ----------
+        start_station_id: [int] The list index of the station from which the 
+        bike is checked out.
+
+        end_station_id: [int] The list index of the station where the bike will
+        check in.
+        """
+        loc_1 = self.stations[start_station_id].location
+        loc_2 = self.stations[end_station_id].location
+        distance = cityblock(loc_1, loc_2)
+        time = distance / SPEED
+        return int(time)
     ### HELPER FUNCTIONS ###
 
     def poisson_thresh(self, k):
@@ -162,6 +311,40 @@ class Simulation:
                 return i
             elif (availability == 'check in') and (self.stations[i].available_docks):
                 return i
+            
+        # In the event that no stations are available
+        return None
+
+    
+    def get_available_dock(self, station, availability):
+        """
+        Returns
+        -------
+        Randomly selected list index of a dock at the given station with one 
+        available bike or one available dock. Random so as to not always pick 
+        same docks from the list.
+
+        Parameters
+        ----------
+        station: [Station] The station for which to check docks.
+
+        availability: [str] Either 'check in' or 'check out'
+        """
+        num_docks = len(station.docks)
+        random_indexes = np.arange(0, num_docks)
+        np.random.shuffle(random_indexes)
+
+        for i in random_indexes:
+            if (availability == 'check out') and (station.docks[i].bike != None):
+                return i
+            elif (availability == 'check in') and (station.docks[i].bike == None):
+                return i
+            
+        # In the event that no docks are available
+        return None
+
+
+
 
 
 

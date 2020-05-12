@@ -56,8 +56,11 @@ class Dock:
             'trip_id': self.bike._uses, # This line may mess us up. not sure how to track yet
             'start_time': time
         })
-
+        
+        # Store bike to return before clearing self.bike
+        bike = self.bike
         self.bike = None
+        return bike
     
 
     ### ASSERTION HELPERS ### 
