@@ -9,7 +9,6 @@ handful of objects in this project.
 3. Station
 4. Simulation
 
-
 ## How the Simulation Works
 1. Bike share system is initialized with a predetermined simulation run time 
 (in minutes), number of stations, docks, and bikes. Each station has a location
@@ -35,13 +34,10 @@ environment and clone this repo. You must be in the directory containing
 ```
 python bike-share-sim
 ```
-By default, a 60-minute simulation is run with 8 stations, each containing 5 
-docks and a total of 30 bikes.
-![basic_sim](/images/basic_sim.png)
+By default, a 120-minute simulation is run with 9 stations, each containing a varying
+number of docks. There are a total of 120 bikes.  
 
 ## Next Steps
 I would love to build the following once the base simlation is done.
 1. Build a simple GUI to visualize the demonstration
 2. Incorporate other bike types such as ElectricBike (and thus perhaps ElectricDock)
-3. Add ability to export all stations' bike logs to a PostgreSQL db to then
-visualize bike ride statistics.

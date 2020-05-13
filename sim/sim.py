@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial.distance import cityblock
 from pprint import pprint as pp
 from .station import Station
+from .bike import ClassicBike
 from .consts import *
 
 class Simulation:
@@ -38,30 +39,52 @@ class Simulation:
         self.bikes_to_dock = []
         self.print_start(length)
         self.run(length)
-        self.print_end()
+        self.print_end(length)
 
     def station_init(self):
         """
         Sets up the stations for this simulation. Number of stations, size of
         stations, and number of bikes can be set from consts.py
         """
-        bikes_per_station = NUM_BIKES // NUM_STATIONS
+        locations = self.generate_locations(5)
 
-        station_id = 0
-        bike_id = 0
-        stations = []
-        for _ in range(NUM_STATIONS):
-            stations.append(Station(
-                station_id, 
-                LOCATIONS[station_id], 
-                MEDIUM_STATION,
-                bikes_per_station,
-                bike_id
-            ))
-            station_id += 1
-            bike_id += bikes_per_station
+        self.stations = [
+            Station(
+                i,                # station id
+                locations[i],     # location
+                STATION_SIZES[i]  # No. of docks
+            )
+            for i in range(NUM_STATIONS)
+        ]
 
-        self.stations = stations
+        # Populate stations with bikes
+        self.distribute_bikes()
+    
+    def generate_bikes(self):
+        """
+        Helper to generate all the bikes that will be put into stations. Allows
+        for flexible creation of stations without having to worry about 
+        populating with bikes on Station init (since it's possible to 
+        instatiate Bikes directly from the Station instatiation)
+        """
+        for i in range(NUM_BIKES):
+            yield ClassicBike(i)
+    
+    def distribute_bikes(self):
+        
+        bikes = self.generate_bikes()
+
+        for i, bike in enumerate(bikes):
+
+            # add one bike to each station if there are available docks.
+            # once we go through the whole list, start again
+            station_index = i % NUM_STATIONS
+            if self.stations[station_index].available_docks:
+                dock_index = self.get_available_dock(
+                    self.stations[station_index], 'check in'
+                )
+                if dock_index != None:
+                    self.stations[station_index].docks[dock_index].bike = bike
 
     def run(self, length):
         """
@@ -81,9 +104,12 @@ class Simulation:
                 # get all of them
                 for _ in range(potential_checkout):
                     self.check_out_sequence(time)
+                    # print(' ' * 5 + '-' * 4)
+                    print('-' * 9)
             
             if self.bikes_to_dock:
                 self.check_in_sequence(time)
+                
             
             self.update_bikes_in_transit()
     
@@ -125,7 +151,8 @@ class Simulation:
             self.bikes_in_transit.append({
                 'bike': bike, 
                 'destination': end_station_id,
-                'time_left': duration
+                'time_left': duration,
+                'duration': duration,
             })
 
             print(f'---- Bike checked out of Station: {station_id} Dock: {dock_id}')
@@ -151,7 +178,7 @@ class Simulation:
             # Station is open
             if dock_id != None:
                 self.stations[destination_id].docks[dock_id].check_in(
-                    bike['bike'], time
+                    bike['bike'], time, bike['duration']
                 )
                 print(
                     '---- Bike checked into Station:', destination_id,
@@ -168,12 +195,21 @@ class Simulation:
                     destination_id, end_station_id
                 )
 
+                # Need to make sure this person gets charged once for the full
+                # duration of their trip
+                total_duration = duration + bike['duration']
+
                 # Add that bike to the in_transit list
                 self.bikes_in_transit.append({
                     'bike': bike['bike'],
                     'destination': end_station_id,
-                    'time_left': duration
+                    'time_left': duration,
+                    'duration': total_duration
                 })
+
+            # print(' ' * 5 + '-' * 4)
+            print('-' * 9)
+
         self.bikes_to_dock = []
     
     def update_bikes_in_transit(self):
@@ -206,7 +242,7 @@ class Simulation:
 
         print('\n')
         print(thick_divider)
-        print('INITIALIZING SIMULATION')
+        print('INITIALIZING BIKE SHARE SIMULATION')
         print(thin_divider)
         print(f'This bike share system has {len(self.stations)} stations:')
         for station in self.stations:
@@ -217,15 +253,37 @@ class Simulation:
         print(f'The simulation will cover {length} minutes')
         print(thin_divider)        
     
-    def print_end(self):
+    def print_end(self, length):
         """
         This prints out the block of text that displays at the end of the
         output of the simulation.
         """
+        rides, revenue, avg_price, avg_duration = self.generate_statistics()
         print('-'*50)
-        print('Simulation is over. Total log of bikes is')
-        pp(self.full_log)
+        print('SIMULATION IS OVER AFTER', length, 'MINUTES')
+        print('There were', rides, 'rides')
+        print(f'Total revenue was ${revenue}')
+        print(f'The average price per ride was ${avg_price}')
+        print(f'The average ride length was {avg_duration} minutes')
         print('='*50)
+
+    def generate_statistics(self):
+        rides = 0
+        revenue = 0
+        greatest_price = 0
+        total_duration = 0
+        for ride in self.full_log:
+            if ride.get('end_time'):
+                rides += 1
+                revenue += ride['price']
+                total_duration += ride['duration']
+                greatest_price = max(greatest_price, ride['price'])
+
+
+        avg_price = round(revenue / rides, 2)
+        avg_duration = int(total_duration / rides)
+
+        return rides, revenue, avg_price, avg_duration
 
     @property
     def full_log(self):
@@ -395,5 +453,27 @@ class Simulation:
             
         # In the event that no docks are available
         return None
+    
+    def generate_locations(self, scalar = None):
+        """
+        Returns
+        -------
+        2D numpy array of coordinates in a 9x9 grid.
 
-# Calculate price and store in log.
+        Parameters
+        -----------
+        scalar: [int] The scalar by which to multiply all points in the 
+        coordinate system
+        """
+        axes = [-1, 0, 1]
+        xs, ys = np.meshgrid(axes, axes)
+        coords = np.stack([xs, ys], axis = -1)
+        coords = coords.reshape(9, 2)
+
+        if scalar:
+            coords = coords * scalar
+
+        # Convert to list of tuples to comply with Station preconditions
+        coords = list(map(tuple, coords))
+
+        return coords
