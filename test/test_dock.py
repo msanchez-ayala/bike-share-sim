@@ -2,6 +2,7 @@ import unittest
 from sim.dock import Dock
 from sim.bike import ClassicBike
 from sim.station import Station
+from sim.consts import CLASSIC_BASE_RATE
 
 class TestDock(unittest.TestCase):
 
@@ -32,14 +33,15 @@ class TestDock(unittest.TestCase):
         self.assertIsNone(self.dock.bike)
         
         # Check bike in 5 mins after init at station
-        self.dock.check_in(self.bike, 5, self.station)
+        self.dock.check_in(self.bike, 5, 5)
 
         self.assertIsInstance(self.bike, ClassicBike)
         self.assertEqual(self.bike.id, 1)
         self.assertEqual(self.dock.log[0], {
             'bike_id': 1,
             'trip_id': 1, # Fix this if we fix dock code
-            'end_time': 5
+            'end_time': 5,
+            'price': CLASSIC_BASE_RATE
         })
 
     def test_check_out(self):
@@ -47,9 +49,9 @@ class TestDock(unittest.TestCase):
         # Check bike in 5 mins after init at station (since the dock was 
         # initialized without a bike in it
 
-        self.dock.check_in(self.bike, 5, self.station)
+        self.dock.check_in(self.bike, 5, 5)
         
-        self.dock.check_out(10, self.station)
+        self.dock.check_out(10)
 
         self.assertIsNone(self.dock.bike)
         self.assertEqual(self.dock.log[1], {
