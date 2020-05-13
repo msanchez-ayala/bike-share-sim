@@ -132,7 +132,7 @@ class Station:
             raise ValueError('location must contain only 2 elements')
         
         for coord in location:
-            if not isinstance(coord, np.integer) or isinstance(coord, np.float):
+            if not isinstance(coord, int):
                 raise TypeError('coordinates must be floats or ints')
         
     def assert_size(self, size):
