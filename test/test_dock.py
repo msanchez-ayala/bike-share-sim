@@ -41,7 +41,8 @@ class TestDock(unittest.TestCase):
             'bike_id': 1,
             'trip_id': 1, # Fix this if we fix dock code
             'end_time': 5,
-            'price': CLASSIC_BASE_RATE
+            'price': CLASSIC_BASE_RATE,
+            'duration': 5
         })
 
     def test_check_out(self):

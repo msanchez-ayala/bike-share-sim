@@ -1,6 +1,7 @@
 from .dock import Dock
 from .bike import ClassicBike
 from .assert_helpers import assert_greater_than_zero
+import numpy as np
 
 class Station:
     """
@@ -131,7 +132,7 @@ class Station:
             raise ValueError('location must contain only 2 elements')
         
         for coord in location:
-            if not isinstance(coord, int) or isinstance(coord, float):
+            if not isinstance(coord, np.integer) or isinstance(coord, np.float):
                 raise TypeError('coordinates must be floats or ints')
         
     def assert_size(self, size):

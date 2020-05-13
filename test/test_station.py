@@ -77,7 +77,8 @@ class TestStation(unittest.TestCase):
             'trip_id': 0, # Fix this if we fix dock code
             'end_time': 15,
             'end_station_id': 1,
-            'price': CLASSIC_BASE_RATE
+            'price': CLASSIC_BASE_RATE,
+            'duration': 15
         })
     
     def test_available_bikes(self):

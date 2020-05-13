@@ -38,12 +38,13 @@ class Dock:
         """
         self.bike = bike
         price = self.bike.price(duration)
-        
+
         self.log.append({
             'bike_id': self.bike.id,
             'trip_id': self.bike._uses, # This line may mess us up. not sure how to track yet
             'end_time': time,
-            'price': price
+            'price': price,
+            'duration': duration
         })
 
     def check_out(self, time):
