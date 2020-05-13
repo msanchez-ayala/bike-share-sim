@@ -2,6 +2,7 @@ import unittest
 from sim.station import Station
 from sim.dock import Dock
 from sim.bike import ClassicBike
+from sim.consts import CLASSIC_BASE_RATE
 
 class TestStation(unittest.TestCase):
     
@@ -70,12 +71,13 @@ class TestStation(unittest.TestCase):
         })
 
         # Make a different bike move at another dock and check again
-        self.station.docks[2].check_in(bike_2, 15)
+        self.station.docks[2].check_in(bike_2, 15, 15)
         self.assertEqual(self.station.log[1], {
             'bike_id': 2,
             'trip_id': 0, # Fix this if we fix dock code
             'end_time': 15,
-            'end_station_id': 1
+            'end_station_id': 1,
+            'price': CLASSIC_BASE_RATE
         })
     
     def test_available_bikes(self):
