@@ -31,7 +31,7 @@ STATION_SIZES = [
     SMALL_STATION
 ]
 
-NUM_BIKES = 120    # Total no. of bikes in system
+NUM_BIKES = 70    # Total no. of bikes in system
 
 LAMBDA = 4 # 1 ride / 10 mins or 0.1 ride / min
 LENGTH = 60  # Length of simulation in minutes
