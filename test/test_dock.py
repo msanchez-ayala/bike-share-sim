@@ -1,4 +1,5 @@
 import unittest
+import numpy as np
 from sim.dock import Dock
 from sim.bike import ClassicBike
 from sim.station import Station
@@ -8,10 +9,11 @@ class TestDock(unittest.TestCase):
 
     def setUp(self):
         self.dock = Dock(1)
+        self.loc = tuple(np.array([0, 0]))
         
         # Instantiate a bike and station. Ride bike into this dock
         self.bike = ClassicBike(1)
-        self.station = Station(1, (0, 0), 1)
+        self.station = Station(1, self.loc, 1)
         self.bike.ride()
 
     def test_init_value_errors(self):

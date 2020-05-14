@@ -133,7 +133,7 @@ class Station:
         
         for coord in location:
             if not isinstance(coord, np.int64):
-                raise TypeError('coordinates must be floats or ints')
+                raise TypeError('coordinates must be np.int64')
         
     def assert_size(self, size):
         if not isinstance(size, int):
