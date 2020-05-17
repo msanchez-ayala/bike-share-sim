@@ -19,19 +19,7 @@ SMALL_STATION = 10  # No. of docks
 MEDIUM_STATION = 15 # No. of docks
 LARGE_STATION = 20 # No. of docks
 
-STATION_SIZES = [
-    LARGE_STATION,
-    MEDIUM_STATION,
-    SMALL_STATION,
-    MEDIUM_STATION,
-    SMALL_STATION,
-    MEDIUM_STATION,
-    SMALL_STATION,
-    MEDIUM_STATION,
-    SMALL_STATION
-]
-
-NUM_BIKES = 70    # Total no. of bikes in system
+NUM_BIKES = 80    # Total no. of bikes in system
 
 LAMBDA = 4 # 1 ride / 10 mins or 0.1 ride / min
 LENGTH = 60  # Length of simulation in minutes
