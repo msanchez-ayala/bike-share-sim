@@ -52,7 +52,7 @@ class Simulation:
             Station(
                 i,                # station id
                 locations[i],     # location
-                STATION_SIZES[i]  # No. of docks
+                MEDIUM_STATION  # No. of docks
             )
             for i in range(NUM_STATIONS)
         ]
@@ -246,7 +246,8 @@ class Simulation:
         print(thin_divider)
         print(f'This bike share system has {len(self.stations)} stations:')
         for station in self.stations:
-            print('Station:', station.id, 
+            print('Station:', station.id,
+                  'Location:', station.location,
                   'Docks:', len(station.docks),
                   'Bikes:', station.available_bikes)
         print('\n')
@@ -380,7 +381,7 @@ class Simulation:
 		in as an argument to vectorize.
         """
         # The k values for which a poisson probability of occurrence is calculated.
-        ks = np.random.normal(1, 1, length)
+        ks = np.random.normal(0, 1, length)
         ks = abs(ks) + 1
         ks = ks.astype(int)
 
