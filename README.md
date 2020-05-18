@@ -39,5 +39,6 @@ statistics about the entire simulation at the end.
 
 ## Next Steps
 I would love to build the following once the base simlation is done.
-1. Build a simple GUI to visualize the demonstration
-2. Incorporate other bike types such as ElectricBike (and thus perhaps ElectricDock)
+1. Include command line inputs for the size of the simulation.
+2. Build a simple GUI to visualize the demonstration
+3. Incorporate other bike types such as ElectricBike (and thus perhaps ElectricDock)
