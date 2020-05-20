@@ -116,6 +116,14 @@ class Station:
     def available_docks(self):
         return self.size - self.available_bikes
     
+    def __getitem__(self, key):
+        self.assert_index(key)
+        return self.docks[key]
+
+    def __iter__(self):
+        return iter(self.docks)
+
+    
     ### ASSERT HELPERS ###
 
     def assert_id(self, id):
@@ -157,3 +165,7 @@ class Station:
 
                 if num_bikes > size:
                     raise ValueError('num_bikes must be less than size')
+    
+    def assert_index(self, key):
+        if key > self.size - 1:
+            raise IndexError('There do not exist this many docks')

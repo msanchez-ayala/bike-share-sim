@@ -8,7 +8,7 @@ from sim.consts import CLASSIC_BASE_RATE
 class TestStation(unittest.TestCase):
     def setUp(self):
         """
-        Only recurring thing is the location as numpy arr
+        Only recurring thing is the location with numpy.int values.
         """
         self.loc = tuple(np.array([0, 0]))
         
@@ -112,6 +112,23 @@ class TestStation(unittest.TestCase):
 
         self.station = Station(0, self.loc, 1, 1, 0)
         self.assertEqual(self.station.available_docks, 0)
+    
+    def test__getitem__(self):
+        self.station = Station(0, self.loc, 3, 1, 0)
+
+        self.assertIsInstance(self.station[0], Dock)
+        self.assertEqual(self.station[0].bike.id, 0)
+        self.assertIsNone(self.station[1].bike)
+
+        with self.assertRaises(IndexError):
+            self.station[3]
+    
+    def test__iter__(self):
+        self.station = Station(0, self.loc, 3, 1, 0)
+
+        for dock in self.station:
+            self.assertIsInstance(dock, Dock)
+    
 
 if __name__ == '__main__':
     unittest.main()
