@@ -24,27 +24,23 @@ class TestBike(unittest.TestCase):
 
     def test_ride(self):
 
-        self.assertEqual(self.bike._uses, 0)
-        self.assertEqual(self.bike.condition, 'good')
+        self.assertEqual(self.bike.trip_id, 0)
         
         for _ in range(50):
             self.bike.ride()
         
-        self.assertEqual(self.bike._uses, 50)
-        self.assertEqual(self.bike.condition, 'fair')
+        self.assertEqual(self.bike.trip_id, 50)
 
         for _ in range(50):
             self.bike.ride()
 
-        self.assertEqual(self.bike._uses, 100)
-        self.assertEqual(self.bike.condition, 'poor')
+        self.assertEqual(self.bike.trip_id, 100)
 
         for _ in range(50):
             self.bike.ride()
         
-        self.assertEqual(self.bike._uses, 150)
-        self.assertEqual(self.bike.condition, 'not in service')
-        
+        self.assertEqual(self.bike.trip_id, 150)
+    
 
 class TestClassicBike(unittest.TestCase):
 

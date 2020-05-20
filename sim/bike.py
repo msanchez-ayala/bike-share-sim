@@ -9,8 +9,6 @@ class Bike:
     (e.g. price()) will only work for subclasses of Bike.
     """
 
-    conditions = CONDITIONS
-
     def __init__(self, id):
         """
         Parameters
@@ -22,47 +20,19 @@ class Bike:
         assert_id(id)
 
         self.id = id
-        self.condition = self.conditions[0]
-        self._uses = 0
+        self.trip_id = 0
 
         # Overridden by subclasses
         self.base_rate = None
         self.add_rate = None
-    
-    def update_condition(self):
-        """
-        Every 50 rides the condition is updated.
-        """
-        if self._uses == 50:
-            # fair
-            self.condition = self.conditions[1]
-        
-        elif self._uses == 100:
-            # poor
-            self.condition = self.conditions[2]
-        
-        elif self._uses == 150:
-            self.condition = self.conditions[3]
 
     def ride(self):
         """
         Triggers a bike ride. Every ride is logged and the condition of the 
-        bike is updated.
-
-        If bike is out of service, try another dock.
+        bike is updated (later when want to implement this). If bike is out of service, try another dock.
         """
         # Update when ready to consider wear/tear
-        self._uses += 1
-        self.update_condition()
-
-        # # If condition isn't 'no service'
-        # if self.condition != self.conditions[3]:
-        #     self._uses += 1
-        #     self.update_condition()
-        
-        # # Don't let people ride a bike that is in poor condition
-        # else:
-        #     return 'Bike out of service'
+        self.trip_id += 1
     
     def price(self, duration):
         """
@@ -84,7 +54,6 @@ class Bike:
         
         else:
             return self.base_rate
-
 
 class ClassicBike(Bike):
     """
