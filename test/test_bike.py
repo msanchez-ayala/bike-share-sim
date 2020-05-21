@@ -1,78 +1,54 @@
-import unittest
-from sim.bike import Bike, ClassicBike, ElectricBike
+import pytest
+from sim.bike import Bike, ClassicBike
 
-class TestBike(unittest.TestCase):
+class TestBike:
 
     print('testing Bike')
 
-    def setUp(self):
-        self.bike = Bike(1)
-    
     def test_init_value_errors(self):
         """
         Check that all appropriate value errors are thrown by __init__()
         """
-        with self.assertRaises(ValueError):
-            self.bike = Bike(-1)        # id
+        with pytest.raises(ValueError):
+            Bike(-1)       
     
     def test_init_type_errors(self):
         """
         Check that all appropriate type errors are thrown by __init__()
         """
-        with self.assertRaises(TypeError):
-            self.bike = Bike('A')        # id
+        with pytest.raises(TypeError):
+            Bike('A')      
+            Bike(True)  
+            Bike([0])    
 
     def test_ride(self):
+        bike = Bike(0)
+        message_init = 'trip_id not initializing correctly'
+        message_add = 'trip_id attribute not adding rides correctly'
 
-        self.assertEqual(self.bike.trip_id, 0)
+        assert bike.trip_id == 0, message_init
         
         for _ in range(50):
-            self.bike.ride()
+            bike.ride()
         
-        self.assertEqual(self.bike.trip_id, 50)
-
-        for _ in range(50):
-            self.bike.ride()
-
-        self.assertEqual(self.bike.trip_id, 100)
-
-        for _ in range(50):
-            self.bike.ride()
-        
-        self.assertEqual(self.bike.trip_id, 150)
+        assert bike.trip_id == 50, message_add
     
+@pytest.fixture
+def classic_bike():
+    yield ClassicBike(0)
 
-class TestClassicBike(unittest.TestCase):
-
-    print('testing ClassicBike')
-
-    def setUp(self):
-        self.bike = ClassicBike(1)
+class TestClassicBike:
     
-    def test_init_value_errors(self):
-        """
-        Check that all appropriate value errors are thrown by __init__()
-        """
-        with self.assertRaises(ValueError):
-            self.bike = ClassicBike(-1) # id
+    def test_price(self, classic_bike):
+        message = 'ClassicBike pricing is not working correctly'
+
+        assert classic_bike.price(45) == 5.00, message
+        assert classic_bike.price(10) == 3.50, message
+        assert classic_bike.price(30) == 3.50, message
+        assert classic_bike.price(0) == 3.50, message
     
-    def test_init_type_errors(self):
-        """
-        Check that all appropriate type errors are thrown by __init__()
-        """
-        with self.assertRaises(TypeError):
-            self.bike = ClassicBike('A') # id
-    
-    def test_price(self):
-        self.assertEqual(self.bike.price(45), 5.00)
-        self.assertEqual(self.bike.price(10), 3.50)
-        self.assertEqual(self.bike.price(30), 3.50)
-
-
-class TestElectricBike(unittest.TestCase):
-
-    pass
-
-
-if __name__ == '__main__':
-    unittest.main()
+    def test_price_error(self, classic_bike):
+        with pytest.raises(ValueError):
+            classic_bike.price(-1)
+            classic_bike.price(-30)
+            classic_bike.price(-45)

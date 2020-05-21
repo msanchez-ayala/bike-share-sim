@@ -1,5 +1,5 @@
 from .consts import *
-from .assert_helpers import assert_id
+from .assert_helpers import assert_id, assert_greater_than_zero
 
 class Bike:
     """
@@ -48,6 +48,8 @@ class Bike:
         ----------
         duration: [int >= 0] How many minutes the ride was.
         """
+        assert_greater_than_zero(duration, 'duration')
+        
         if duration > 30:
             price = self.base_rate + (duration - 30) * self.add_rate
             return price
