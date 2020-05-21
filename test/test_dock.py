@@ -1,6 +1,5 @@
 import pytest
 from mock import Mock
-import numpy as np
 from sim.dock import Dock
 from sim.bike import ClassicBike
 from sim.consts import CLASSIC_BASE_RATE
