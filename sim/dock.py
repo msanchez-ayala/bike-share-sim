@@ -41,7 +41,7 @@ class Dock:
 
         self.log.append({
             'bike_id': self.bike.id,
-            'trip_id': self.bike.trip_id, # This line may mess us up. not sure how to track yet
+            'trip_id': self.bike.trip_id,
             'end_time': time,
             'price': price,
             'duration': duration
@@ -59,7 +59,7 @@ class Dock:
 
         self.log.append({
             'bike_id': self.bike.id,
-            'trip_id': self.bike._uses, # This line may mess us up. not sure how to track yet
+            'trip_id': self.bike.trip_id,
             'start_time': time
         })
         
