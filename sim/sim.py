@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial.distance import cityblock
 from pprint import pprint as pp
 from .station import Station
+from .dock import Dock
 from .bike import ClassicBike
 from .consts import *
 
@@ -46,31 +47,42 @@ class Simulation:
         Sets up the stations for this simulation. Number of stations, size of
         stations, and number of bikes can be set from consts.py
         """
-        locations = self.generate_locations(5)
+        locations = self.generate_locations(scalar = 5)
 
         self.stations = [
             Station(
-                i,                # station id
-                locations[i],     # location
-                MEDIUM_STATION  # No. of docks
+                i,             # station id
+                locations[i],  # location
+                MEDIUM_STATION # No. of docks
             )
             for i in range(NUM_STATIONS)
         ]
 
+        # Fill dock spaces with actual docks
+        self.distribute_docks()
+
         # Populate stations with bikes
         self.distribute_bikes()
+
+    def distribute_docks(self):
+        """
+        Helper to generate all the docks that will be put into stations.
+        """
+        for station_id in range(NUM_STATIONS):
+            for dock_id in range(MEDIUM_STATION):
+                self.stations[station_id].docks[dock_id] = Dock(dock_id)
     
     def generate_bikes(self):
         """
-        Helper to generate all the bikes that will be put into stations. Allows
-        for flexible creation of stations without having to worry about 
-        populating with bikes on Station init (since it's possible to 
-        instatiate Bikes directly from the Station instatiation)
+        Helper to generate all the bikes that will be put into stations.
         """
         for i in range(NUM_BIKES):
             yield ClassicBike(i)
     
     def distribute_bikes(self):
+        """
+        Helper to assign bikes to a dock.
+        """
         
         bikes = self.generate_bikes()
 
