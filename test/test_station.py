@@ -1,134 +1,124 @@
-import unittest
+import copy
+import pytest
+from mock import Mock
 import numpy as np
 from sim.station import Station
 from sim.dock import Dock
 from sim.bike import ClassicBike
 from sim.consts import CLASSIC_BASE_RATE
 
-class TestStation(unittest.TestCase):
-    def setUp(self):
-        """
-        Only recurring thing is the location with numpy.int values.
-        """
-        self.loc = tuple(np.array([0, 0]))
-        
+@pytest.fixture
+def loc():
+    return tuple(np.array([0, 0]))
 
-    def test_init_value_errors(self):
+def get_classic_bike():
+    bike = Mock(spec = ClassicBike)
+    return bike
+
+def get_docks():
+    dock_1 = Mock(spec = Dock)
+    dock_1.log = []
+    dock_1.bike = get_classic_bike()
+    dock_2 = copy.deepcopy(dock_1)
+    return dock_1, dock_2
+
+@pytest.fixture
+def station(loc):
+    station = Station(0, loc, 2)
+    station.docks[0], station.docks[1] = get_docks()
+    return station
+
+
+class TestStation: 
+
+    def test_init_value_errors(self, loc):
         """
         Check that all appropriate value errors are thrown by __init__()
         """
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             loc_error = tuple(np.array([0, 0, 0]))
 
-            self.station = Station(-1, self.loc, 1)     # id
-            self.station = Station(0, loc_error, 1)  # location
-            self.station = Station(0, self.loc, -1)    # size
-            self.station = Station(0, self.loc, 0)     # docks
-            self.station = Station(0, self.loc, 21)     # docks
-            self.station = Station(0, self.loc, 2, 3)  # num_bikes
-            self.station = Station(0, self.loc, 2, -1) # num_bikes
-        
-    def test_init_type_errors(self):
+            Station(-1, loc, 1)      # id
+            Station(0, loc_error, 1) # location
+            Station(0, loc, -1)      # size
+
+    def test_init_type_errors(self, loc):
         """
         Check that all appropriate type errors are thrown by __init__()
         """
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             loc_error_1 = (np.array([0.0, 0.0]))
             loc_error_2 = np.array([0, 0])
 
-            self.station = Station(0.0, self.loc, 1)     # id
-            self.station = Station(0, loc_error_1, 1)      # location
-            self.station = Station(0, loc_error_2, 1)    # location
-            self.station = Station(0, self.loc, '1')    # size
-            self.station = Station(0, self.loc, 2, '1') # num_bikes
+            Station(0.0, loc, 1)       # id
+            Station(0, loc_error_1, 1) # location
+            Station(0, loc_error_2, 1) # location
+            Station(0, loc, '1')       # size
 
-    def test_init_docks_empty(self):
-        """
-        Test where all docks are empty.
-        """
-        self.station = Station(1, self.loc, 4)
-        for i in range(self.station.size):
-            self.assertIsInstance(self.station.docks[i], Dock)
+    def test_init_docks(self, loc):
+        station = Station(1, loc, 4)
+        assert len(station.docks) == 4\
+            , "The incorrect number of docks was initialized"
+
+        for i in range(station.size):
+            assert station[i] == None, 'This dock space is not empty'
     
-    def test_init_docks_filled(self):
-        """
-        Test where some docks are empty and some are filled.
-        """
-        self.station = Station(1, self.loc, 3, 2, 0)
+    def test_log(self, station):
+        # Make sure empty log
+        assert station.log == []\
+            , "Log was wrongly instantiated with some activity"
 
-        # Assert number of bikes is appropriate and have correct IDs
-        self.assertEqual(self.station.docks[0].bike.id, 0)
-        self.assertEqual(self.station.docks[1].bike.id, 1)
-        self.assertIsNone(self.station.docks[2].bike)        
-    
-    def test_log(self):
-        self.station = Station(1, self.loc, 4)
-
-        # Empty log
-        self.assertEqual(self.station.log, [])
-
-        # Instatiate some bikes and populate 
-        bike_1 = ClassicBike(1)
-        bike_2 = ClassicBike(2)
-
-        self.station.docks[0].bike = bike_1
-
-        # Make a bike move and check log again
-        self.station.docks[0].check_out(10)
-        self.assertEqual(self.station.log[0], {
+        # Pretend a trip started and check log
+        station.docks[0].log.append({
             'bike_id': 1,
-            'trip_id': 1, # Fix this if we fix dock code
+            'trip_id': 1,
             'start_time': 10,
             'start_station_id': 1
         })
+        assert station.log[0] == {
+            'bike_id': 1,
+            'trip_id': 1,
+            'start_time': 10,
+            'start_station_id': 0
+        }, 'Not registering trips correctly (check out)'
 
-        # Make a different bike move at another dock and check again
-        self.station.docks[2].check_in(bike_2, 15, 15)
-        self.assertEqual(self.station.log[1], {
+        # Pretend a trip finished at another dock and check again
+        station.docks[1].log.append({
             'bike_id': 2,
-            'trip_id': 0, # Fix this if we fix dock code
-            'end_time': 15,
-            'end_station_id': 1,
-            'price': CLASSIC_BASE_RATE,
-            'duration': 15
+            'trip_id': 1,
+            'end_time': 10,
+            'end_station_id': 1
         })
+        assert station.log[1] == {
+            'bike_id': 2,
+            'trip_id': 1,
+            'end_time': 10,
+            'end_station_id': 0
+        }, 'Not registering trips correctly (check in)'
     
-    def test_available_bikes(self):
-        self.station = Station(0, self.loc, 3, 2, 0)
-        self.assertEqual(self.station.available_bikes, 2)
+    def test_available_bikes(self, station):
+        assert station.available_bikes == 2, 'Not registering number of bikes'
 
-        self.station.docks[0].check_out(0)
-        self.assertEqual(self.station.available_bikes, 1)
-
-        self.station = Station(0, self.loc, 1)
-        self.assertEqual(self.station.available_bikes, 0)
+        station.docks[0].bike = None
+        assert station.available_bikes == 1, 'Not registering change in bikes'
     
-    def test_available_docks(self):
-        self.station = Station(0, self.loc, 3, 2, 0)
-        self.assertEqual(self.station.available_docks, 1)
+    def test_available_docks(self, station):
+        assert station.available_docks == 0\
+            , 'Not registering correct no. of docks'
 
-        self.station.docks[0].check_out(0)
-        self.assertEqual(self.station.available_docks, 2)
+        station.docks[1].bike = None
+        assert station.available_docks == 1, "Not registering change in bikes"
 
-        self.station = Station(0, self.loc, 1, 1, 0)
-        self.assertEqual(self.station.available_docks, 0)
+        station.docks[0].bike = None
+        assert station.available_docks == 2, "Not registering change in bikes"
     
-    def test__getitem__(self):
-        self.station = Station(0, self.loc, 3, 1, 0)
-
-        self.assertIsInstance(self.station[0], Dock)
-        self.assertEqual(self.station[0].bike.id, 0)
-        self.assertIsNone(self.station[1].bike)
-
-        with self.assertRaises(IndexError):
-            self.station[3]
+    def test__getitem__(self, station):
+        assert isinstance(station[0], Dock)\
+            , 'Not able to index. Check constructor'
+        with pytest.raises(IndexError):
+            station[2]
     
-    def test__iter__(self):
-        self.station = Station(0, self.loc, 3, 1, 0)
-
-        for dock in self.station:
-            self.assertIsInstance(dock, Dock)
+    def test__iter__(self, station):
+        for dock in station:
+            assert isinstance(dock, Dock), 'Not able to loop. Check constructor'
     
-
-if __name__ == '__main__':
-    unittest.main()
