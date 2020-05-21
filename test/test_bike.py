@@ -33,25 +33,22 @@ class TestBike:
         
         assert bike.trip_id == 50, message_add
     
+@pytest.fixture
+def classic_bike():
+    return ClassicBike(0)
 
-class TestClassicBike:
+class TestClassicBike:   
 
-    def setup_method(self, method):
-        self.classic_bike = ClassicBike(0)
-    
-    def teardown_method(self, method):
-        self.classic_bike = None
-    
-    def test_price(self):
+    def test_price(self, classic_bike):
         message = 'ClassicBike pricing is not working correctly'
 
-        assert self.classic_bike.price(45) == 5.00, message
-        assert self.classic_bike.price(10) == 3.50, message
-        assert self.classic_bike.price(30) == 3.50, message
-        assert self.classic_bike.price(0) == 3.50, message
+        assert classic_bike.price(45) == 5.00, message
+        assert classic_bike.price(10) == 3.50, message
+        assert classic_bike.price(30) == 3.50, message
+        assert classic_bike.price(0) == 3.50, message
     
-    def test_price_error(self):
+    def test_price_error(self, classic_bike):
         with pytest.raises(ValueError):
-            self.classic_bike.price(-1)
-            self.classic_bike.price(-30)
-            self.classic_bike.price(-45)
+            classic_bike.price(-1)
+            classic_bike.price(-30)
+            classic_bike.price(-45)
