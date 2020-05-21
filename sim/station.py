@@ -9,7 +9,7 @@ class Station:
     entries and exits.
     """
 
-    def __init__(self, id, location, size, num_bikes = 0, bike_id_start = None):
+    def __init__(self, id, location, size):
         """
         Creates a new Station.
 
@@ -31,40 +31,17 @@ class Station:
         self.assert_id(id)
         self.assert_location(location)
         self.assert_size(size)
-        self.assert_num_bikes(size, num_bikes)
 
         self.id = id
         self.location = location
         self.size = size
-        self.init_docks(num_bikes, bike_id_start)
+        self.docks = self.init_docks()
 
-    def init_docks(self, num_bikes, bike_id_start):
+    def init_docks(self):
         """
-        Creates a list of Dock objects that can hold bikes. Docks do not move,
-        and are the only part of the station that interacts with Bike objs.
+        Creates an empty list for Dock objects that can hold bikes. Docks do not move, and are the part of the station that interacts with Bikes.
         """
-        self.docks = []
-        bikes_left = num_bikes
-        bike_id = bike_id_start
-
-        # Instantiate each Dock to populate the dock attribute
-        for i in range(self.size):
-            
-            # If more bikes to be added, instantiate Dock w/ ClassicBike
-            if bikes_left > 0:   
-                
-                # Set up bike and dock, put it into docks
-                bike = ClassicBike(bike_id)
-                dock = Dock(i, bike)
-                self.docks.append(dock)
-
-                # Prepare for next iteration of loop
-                bike_id += 1
-                bikes_left -= 1
-            
-            # Otherwise instantiate empty Dock
-            elif bikes_left == 0:
-                self.docks.append(Dock(i))
+        return [None] * self.size
 
     @property
     def log(self):
@@ -77,11 +54,9 @@ class Station:
 
         # Go through each dock and access the log attribute. Append to full log
         # and return
-        for i in range(self.size):
-            if self.docks[i].log:
-                
-                current_log = self.docks[i].log
-
+        for dock in self.docks:
+            if dock.log:
+                current_log = dock.log
                 for trip in current_log:
 
                     # If this is start of a trip, add start station
@@ -123,7 +98,6 @@ class Station:
     def __iter__(self):
         return iter(self.docks)
 
-    
     ### ASSERT HELPERS ###
 
     def assert_id(self, id):
@@ -150,22 +124,6 @@ class Station:
         if (size < 1 ) or (size > 20) :
             raise ValueError('size must be in [1, 20].')
 
-
-    def assert_num_bikes(self, size, num_bikes):
-        """
-        Makes sure preconditions are met.
-        """
-        # If optional arg is passed
-        if num_bikes:
-            if not isinstance(num_bikes, int):
-                raise TypeError('num_bikes must be an int')
-            
-            elif isinstance(num_bikes, int):
-                assert_greater_than_zero(num_bikes, 'num_bikes')
-
-                if num_bikes > size:
-                    raise ValueError('num_bikes must be less than size')
-    
     def assert_index(self, key):
         if key > self.size - 1:
             raise IndexError('There do not exist this many docks')
