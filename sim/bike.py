@@ -19,12 +19,20 @@ class Bike:
         """
         assert_id(id)
 
-        self.id = id
-        self.trip_id = 0
+        self.__id = id
+        self.__trip_id = 0
 
         # Overridden by subclasses
         self.base_rate = None
         self.add_rate = None
+
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def trip_id(self):
+        return self.__trip_id
 
     def ride(self):
         """
@@ -32,7 +40,7 @@ class Bike:
         bike is updated (later when want to implement this). If bike is out of service, try another dock.
         """
         # Update when ready to consider wear/tear
-        self.trip_id += 1
+        self.__trip_id += 1
     
     def price(self, duration):
         """
@@ -62,7 +70,7 @@ class ClassicBike(Bike):
     Subclass for the classic bike option.
     """
     def __init__(self, id):
-        Bike.__init__(self, id)
+        super().__init__(id)
         self.base_rate = CLASSIC_BASE_RATE
         self.add_rate = CLASSIC_ADD_RATE
 
@@ -74,7 +82,7 @@ class ElectricBike(Bike):
     """
 
     def __init__(self, id):
-        Bike.__init__(self, id)
+        super().__init__(id)
         self.base_rate = ELECTRIC_BASE_RATE
         self.add_rate = ELECTRIC_ADD_RATE
         self.charge = ELECTRIC_MAX_CHARGE
