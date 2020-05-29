@@ -1,6 +1,6 @@
 from .consts import CONDITIONS
 from .assert_helpers import assert_id
-from .bike import ClassicBike
+from .bike import Bike, ClassicBike
 
 class Dock:
     """
@@ -17,12 +17,29 @@ class Dock:
         bike: [Bike | None] The Bike or None value to occupy this dock.
         """
         assert_id(id)
-        self.assert_bike(bike)
 
-        self.id = id
+        self.__id = id
         self.bike = bike
-        self.condition = self.conditions[0]
-        self.log = []
+        self.__log = []
+    
+    @property
+    def id(self):
+        return self.__id
+    
+    @property
+    def bike(self):
+        return self.__bike
+    
+    @bike.setter
+    def bike(self, bike):
+        if (bike == None) or (isinstance(bike, Bike)):
+            self.__bike = bike
+        else:
+            raise TypeError('bike must be a Bike object or None')
+    
+    @property
+    def log(self):
+        return self.__log
     
     def check_in(self, bike, time, duration):
         """
@@ -39,7 +56,7 @@ class Dock:
         self.bike = bike
         price = self.bike.price(duration)
 
-        self.log.append({
+        self.__log.append({
             'bike_id': self.bike.id,
             'trip_id': self.bike.trip_id,
             'end_time': time,
@@ -57,7 +74,7 @@ class Dock:
         """
         self.bike.ride()
 
-        self.log.append({
+        self.__log.append({
             'bike_id': self.bike.id,
             'trip_id': self.bike.trip_id,
             'start_time': time
@@ -67,13 +84,5 @@ class Dock:
         bike = self.bike
         self.bike = None
         return bike
-    
 
-    ### ASSERTION HELPERS ### 
-    
-
-    def assert_bike(self, bike):
-        if bike:
-            if not isinstance(bike, ClassicBike):
-                raise TypeError('This bike is not a ClassicBike')
 
