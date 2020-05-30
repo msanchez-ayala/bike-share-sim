@@ -32,10 +32,22 @@ class Station:
         self.assert_location(location)
         self.assert_size(size)
 
-        self.id = id
-        self.location = location
-        self.size = size
-        self.docks = self.init_docks()
+        self._id = id            
+        self._location = location
+        self._size = size        
+        self.docks = self.init_docks()  
+    
+    @property
+    def id(self):
+        return self._id
+    
+    @property
+    def location(self):
+        return self._location
+    
+    @property
+    def size(self):
+        return self._size
 
     def init_docks(self):
         """
