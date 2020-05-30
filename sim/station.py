@@ -67,20 +67,21 @@ class Station:
         # Go through each dock and access the log attribute. Append to full log
         # and return
         for dock in self.docks:
-            if dock.log:
-                current_log = dock.log
-                for trip in current_log:
+            if not dock.log:
+                continue
 
-                    # If this is start of a trip, add start station
-                    if trip.get('start_time'):
-                        trip['start_station_id'] = self.id
+            for trip in dock.log:
 
-                    # If it's an end of a trip, add end station
-                    elif trip.get('end_time'):
-                        trip['end_station_id'] = self.id
+                # If this is start of a trip, add start station
+                if trip.get('start_time'):
+                    trip['start_station_id'] = self.id
 
-                    # Add all individual trips to the total log
-                    result.append(trip)
+                # If it's an end of a trip, add end station
+                elif trip.get('end_time'):
+                    trip['end_station_id'] = self.id
+
+                # Add all individual trips to the total log
+                result.append(trip)
 
         return result
     
@@ -91,13 +92,8 @@ class Station:
         -------
         The number of bikes currently docked at this station.
         """
-        bikes = 0
-
-        for dock in self.docks:
-            if dock.bike:
-                bikes += 1
-        
-        return bikes
+        bikes = [1 if dock.bike else 0 for dock in self.docks]
+        return sum(bikes)
     
     @property
     def available_docks(self):
