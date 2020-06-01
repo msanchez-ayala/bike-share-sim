@@ -18,28 +18,28 @@ class Dock:
         """
         assert_id(id)
 
-        self.__id = id
-        self.bike = bike
-        self.__log = []
+        self._id = id
+        self._bike = bike
+        self._log = []
     
     @property
     def id(self):
-        return self.__id
+        return self._id
     
     @property
     def bike(self):
-        return self.__bike
+        return self._bike
     
     @bike.setter
     def bike(self, bike):
         if (bike == None) or (isinstance(bike, Bike)):
-            self.__bike = bike
+            self._bike = bike
         else:
             raise TypeError('bike must be a Bike object or None')
     
     @property
     def log(self):
-        return self.__log
+        return self._log
     
     def check_in(self, bike, time, duration):
         """
@@ -56,7 +56,7 @@ class Dock:
         self.bike = bike
         price = self.bike.price(duration)
 
-        self.__log.append({
+        self._log.append({
             'bike_id': self.bike.id,
             'trip_id': self.bike.trip_id,
             'end_time': time,
@@ -74,7 +74,7 @@ class Dock:
         """
         self.bike.ride()
 
-        self.__log.append({
+        self._log.append({
             'bike_id': self.bike.id,
             'trip_id': self.bike.trip_id,
             'start_time': time
