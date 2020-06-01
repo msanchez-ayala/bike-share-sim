@@ -4,7 +4,7 @@ from pprint import pprint as pp
 from .station import Station
 from .dock import Dock
 from .bike import ClassicBike
-from .consts import *
+from .consts import NUM_STATIONS, NUM_BIKES, MEDIUM_STATION, LAMBDA, SPEED
 
 class Simulation:
     """
@@ -49,19 +49,18 @@ class Simulation:
         """
         locations = self.generate_locations(scalar = 5)
 
+        # Instantiate empty stations
         self.stations = [
             Station(
-                i,             # station id
-                locations[i],  # location
-                MEDIUM_STATION # No. of docks
+                id = i, location = locations[i], size = MEDIUM_STATION
             )
             for i in range(NUM_STATIONS)
         ]
 
-        # Fill dock spaces with actual docks
+        # Fill stations' dock spaces with actual docks
         self.distribute_docks()
 
-        # Populate stations with bikes
+        # Populate docks with bikes
         self.distribute_bikes()
 
     def distribute_docks(self):
@@ -108,7 +107,7 @@ class Simulation:
 
         # Each loop represents one minute in the simulation    
         for time, potential_checkout in enumerate(potential_checkouts):
-            print(f'Minute:', time)
+            print('Minute:', time)
 
             if potential_checkout:
 
@@ -116,47 +115,46 @@ class Simulation:
                 # get all of them
                 for _ in range(potential_checkout):
                     self.check_out_sequence(time)
-                    # print(' ' * 5 + '-' * 4)
                     print('-' * 9)
             
             if self.bikes_to_dock:
                 self.check_in_sequence(time)
                 
-            
             self.update_bikes_in_transit()
     
     def check_out_sequence(self, time):
         """
         Performs a check-out sequence. 
         
-        Checks for available stations. If exists, finds available dock and 
-        then checks out the bike. If not exists, prints that no bikes were 
+        Checks for stations with bikes that can be checked out at the moment. 
+        If one exists, this finds the available dock, checks out the bike, and 
+        adds it to self.bikes_in_transit.
+        
+        If all bikes are currently checked out, prints that no bikes were 
         available at this time.
-
-        If bike was checked out, it is added to bikes in transit list.
 
         Parameters
         -----------
         time: [int] the minute that the current simulation is at.
         """
-        station_id = self.get_available_station('check out')
+        start_station_id = self.get_available_station('check out')
         print('---- Customer tried to check out a bike')
         
         # Only proceed if there exists an open dock
-        if station_id != None:
-
-            # print('----', self.stations[station_id].available_bikes,
-            #     'bike(s) available')
+        if start_station_id != None:
 
             # Find index of an open dock at this station and check out
             dock_id = self.get_available_dock(
-                self.stations[station_id], 'check out'
+                self.stations[start_station_id], 'check out'
             )
 
-            bike = self.stations[station_id].docks[dock_id].check_out(time)
-            end_station_id = self.determine_destination(station_id)
+            bike = self.stations[start_station_id]\
+                .docks[dock_id]\
+                .check_out(time)
+
+            end_station_id = self.determine_destination(start_station_id)
             duration = self.determine_trip_duration(
-                station_id, end_station_id
+                start_station_id, end_station_id
             )
 
             # Add that bike to the in_transit list
@@ -167,7 +165,10 @@ class Simulation:
                 'duration': duration,
             })
 
-            print(f'---- Bike checked out of Station: {station_id} Dock: {dock_id}')
+            print(
+                f'---- Bike checked out of Station: {start_station_id}',
+                f'Dock: {dock_id}'
+            )
         
         else:
             print('---- No available stations for checkout at this time')
@@ -176,8 +177,13 @@ class Simulation:
         """
         Performs a check-in sequence.
 
-        There are two possibilites: the original destination is open when the
-        bike "arrives", or it isn't Both are covered here.
+        There are two possibilites: 
+        1) the original destination is open when the bike "arrives" so the bike
+        is checked in no problems.
+        2) it isn't, so we have to set out to find another station that does
+        have available docks.
+
+        Both are covered here and the outcome is printed in the simulation.
         """
         for bike in self.bikes_to_dock:
 
@@ -201,7 +207,7 @@ class Simulation:
             # for this new trip is now the old destination (destination_id)
             else:
                 print('---- Station was full. Customer could not check bike in')
-                print('---- Setting off to find another station with empty slots')
+                print('---- Finding another station with empty slots')
                 end_station_id = self.determine_destination(destination_id)
                 duration = self.determine_trip_duration(
                     destination_id, end_station_id
@@ -219,7 +225,6 @@ class Simulation:
                     'duration': total_duration
                 })
 
-            # print(' ' * 5 + '-' * 4)
             print('-' * 9)
 
         self.bikes_to_dock = []
@@ -281,6 +286,13 @@ class Simulation:
         print('='*50)
 
     def generate_statistics(self):
+        """
+        Returns
+        --------
+        The total number of rides, the total revenue, the average price, and 
+        the average trip duration for all of the rides conducted in the current 
+        simulation.
+        """
         rides = 0
         revenue = 0
         greatest_price = 0
@@ -321,9 +333,14 @@ class Simulation:
         start_station_id: [int] The list index of the station where the bike
         is checked out from.
         """
+        # Full list of ids
         station_ids = np.arange((len(self.stations)))
+
+        # Take out starting id
         station_ids = np.delete(station_ids, start_station_id)
+
         end_station_id = np.random.choice(station_ids)
+
         return end_station_id
     
     def determine_trip_duration(self, start_station_id, end_station_id):
@@ -478,8 +495,13 @@ class Simulation:
         scalar: [int] The scalar by which to multiply all points in the 
         coordinate system
         """
+        # Range of both x and y values in a square cartesian coord system
         axes = [-1, 0, 1]
+
+        # x and y values for a meshgrid
         xs, ys = np.meshgrid(axes, axes)
+
+        # Stack and reshape to get coordinate pairs
         coords = np.stack([xs, ys], axis = -1)
         coords = coords.reshape(9, 2)
 
