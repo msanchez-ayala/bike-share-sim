@@ -5,4 +5,4 @@ install:
     - pip install -r requirements.txt
     - pip install pytest-cov codecov # Install packages for code coverage report
 script:
-    - pytest --cov=src test # Point to source directory
+    - pytest --cov=sim test # Point to sim directory
