@@ -1,4 +1,8 @@
 # bike-share-sim
+
+[![Build Status](https://travis-ci.com/msanchez-ayala/bike-share-sim.svg?branch=master)](https://travis-ci.com/msanchez-ayala/bike-share-sim)
+
+
 A Python simulation of a bike share such as Citibike. The goal is to practice
 my OOP skills by creating a simple bike share simulation. There are only a 
 handful of objects in this project.
